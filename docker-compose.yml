@@ -1,0 +1,8 @@
+version: '3'
+services:
+  pubsub:
+    build: .
+    ports: 
+    - "8681:8681"
+    volumes:
+    - /Users/drewjocham/Desktop/pubsub/run.sh:/run.sh
