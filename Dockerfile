@@ -35,5 +35,6 @@ HEALTHCHECK --interval=2s --start-period=15s --retries=5 \
    CMD sh -c "netstat -tulpen | grep 0.0.0.0:8681 || exit 1"
 
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ./run.sh
+RUN ls -all
+CMD [ "/bin/bash", "-l", "-c", "./run.sh" ]
 EXPOSE 8681
