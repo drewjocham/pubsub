@@ -26,15 +26,16 @@ RUN cd /usr/bin \
 RUN pip install google-cloud-pubsub
 RUN apk --update --no-cache add tini bash
 
-ENV PUBSUB_EMULATOR_HOST=localhost:8681
-ENV PUBSUB_PROJECT_ID=local
+ENV PUBSUB_EMULATOR_HOST=localhost:${PORT}
+ENV PUBSUB_PROJECT_ID=${PROJECT}
 
-CMD /pubsub-emulator/bin/cloud-pubsub-emulator --host=0.0.0.0 --port=8681 --project=local
+CMD /pubsub-emulator/bin/cloud-pubsub-emulator --host=0.0.0.0 --port=${PORT} --project=${PROJECT}
 
 HEALTHCHECK --interval=2s --start-period=15s --retries=5 \
-   CMD sh -c "netstat -tulpen | grep 0.0.0.0:8681 || exit 1"
+   CMD sh -c "netstat -tulpen | grep 0.0.0.0:${PORT} || exit 1"
 
 ENTRYPOINT ["/sbin/tini", "--"]
 RUN ls -all
-CMD [ "/bin/bash", "-l", "-c", "./run.sh" ]
+
 EXPOSE 8681
+CMD [ "/bin/bash", "-l", "-c", "./run.sh"]
