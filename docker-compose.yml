@@ -3,9 +3,10 @@ services:
   pubsub:
     build: .
     environment:
-      - PORT=8681
-      - PROJECT=local
+      PORT: 8681
+      PUBSUB_PROJECT_ID: local
+      PUBSUB_EMULATOR_HOST: "localhost:8681"
     ports:
     - "8681:8681"
     volumes:
-    - /Users/drewjocham/Desktop/pubsub/run.sh:/run.sh
+    - /Users/jocham/Desktop/pubsub/run.sh:/run.sh

@@ -1,10 +1,13 @@
 FROM google/cloud-sdk:alpine
 RUN gcloud components install pubsub-emulator
 
-FROM openjdk:8-jre-alpine
+FROM bellsoft/liberica-openjdk-alpine:8
 
 # Only copy what we need from cloud-sdk
 COPY --from=0 /google-cloud-sdk/platform/pubsub-emulator /pubsub-emulator
+
+COPY ./start-pubsub-service.sh /start-pubsub-service.sh
+#COPY ./create-topics-and-subscriptions.sh /run.sh
 
 COPY ./publisher.py /
 COPY ./subscriber.py /
@@ -26,16 +29,7 @@ RUN cd /usr/bin \
 RUN pip install google-cloud-pubsub
 RUN apk --update --no-cache add tini bash
 
-ENV PUBSUB_EMULATOR_HOST=localhost:${PORT}
-ENV PUBSUB_PROJECT_ID=${PROJECT}
-
-CMD /pubsub-emulator/bin/cloud-pubsub-emulator --host=0.0.0.0 --port=${PORT} --project=${PROJECT}
-
 HEALTHCHECK --interval=2s --start-period=15s --retries=5 \
-   CMD sh -c "netstat -tulpen | grep 0.0.0.0:${PORT} || exit 1"
+	 CMD netstat -an | grep ${PORT} > /dev/null; if [ 0 != $? ]; then exit 1; fi;
 
-ENTRYPOINT ["/sbin/tini", "--"]
-RUN ls -all
-
-EXPOSE 8681
-CMD [ "/bin/bash", "-l", "-c", "./run.sh"]
+CMD nohup bash -c "/start-pubsub-service.sh &" && sleep 10 && "/run.sh"
